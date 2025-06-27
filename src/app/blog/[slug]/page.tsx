@@ -8,7 +8,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
-import { Calendar, Clock, User, ArrowRight, Search, Filter, Eye, ChevronLeft, Tag, Share2, Heart } from 'lucide-react';
+import { Calendar, Clock, /*User, ArrowRight, Search, Filter,*/ Eye, ChevronLeft,/* Tag, */Share2, /*Heart*/ } from 'lucide-react';
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -37,6 +37,20 @@ interface BlogHeader {
   keywords?: string[];
 }
 
+// Separate interface for related blogs (without is_featured requirement)
+interface RelatedBlog {
+  id: number;
+  blog_name: string;
+  slug: string;
+  excerpt?: string;
+  featured_image?: string;
+  category?: string;
+  author_name?: string;
+  author_image?: string;
+  published_at: string;
+  view_count?: number;
+}
+
 interface BlogContent {
   id: number;
   blog_header_id: number;
@@ -51,7 +65,7 @@ const BlogPostPage = () => {
   
   const [blog, setBlog] = useState<BlogHeader | null>(null);
   const [blogContent, setBlogContent] = useState<BlogContent | null>(null);
-  const [relatedBlogs, setRelatedBlogs] = useState<BlogHeader[]>([]);
+  const [relatedBlogs, setRelatedBlogs] = useState<RelatedBlog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
