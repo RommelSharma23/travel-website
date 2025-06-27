@@ -36,7 +36,7 @@ const FirstVisitContactModal = () => {
     }
   }, []);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -75,7 +75,7 @@ const FirstVisitContactModal = () => {
     return true;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('');
@@ -164,7 +164,7 @@ const FirstVisitContactModal = () => {
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {submitStatus === 'success' && (
             <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-green-800 font-medium">Thank you! We'll get back to you within 24 hours.</p>
+              <p className="text-green-800 font-medium">Thank you! {`We'll`} get back to you within 24 hours.</p>
             </div>
           )}
 

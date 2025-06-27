@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { X, MapPin, Calendar, Users, MessageCircle, Send, Plane } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -38,7 +38,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
     }));
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     // Reset form when closing
     setFormData({
       name: '',
@@ -52,7 +52,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
     });
     setSubmitStatus('');
     onClose();
-  };
+  }, [onClose]);
 
   // Form validation function
   const validateForm = () => {
@@ -93,8 +93,8 @@ const ContactModal: React.FC<ContactModalProps> = ({
     }
 
     try {
-      // Insert the inquiry
-      const { data, error } = await supabase
+      // Insert the inquiry - REMOVED unused 'data' variable
+      const { error } = await supabase
         .from('inquiries')
         .insert([{
           name: formData.name.trim(),
@@ -127,7 +127,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
     }
   };
 
-  // Handle escape key
+  // Handle escape key - FIXED: Added handleClose to dependency array
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -144,7 +144,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen]);
+  }, [isOpen, handleClose]);
 
   if (!isOpen) return null;
 
@@ -175,7 +175,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {submitStatus === 'success' && (
             <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-green-800 font-medium">Thank you! We'll get back to you within 24 hours.</p>
+              <p className="text-green-800 font-medium">Thank you! {`We'll`} get back to you within 24 hours.</p>
             </div>
           )}
 
