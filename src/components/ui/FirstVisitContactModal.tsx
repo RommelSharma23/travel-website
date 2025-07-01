@@ -1,6 +1,7 @@
+// components/ui/FirstVisitContactModal.tsx
+
 'use client';
 
-// components/ui/FirstVisitContactModal.tsx
 import React, { useState, useEffect } from 'react';
 import { X, MapPin, Calendar, Users, MessageCircle, Send, Plane } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -17,8 +18,7 @@ const FirstVisitContactModal = () => {
     travel_dates: '',
     group_size: 1,
     budget: '',
-    message: '',
-    source: 'First Visit Popup'
+    message: ''
   });
 
   useEffect(() => {
@@ -46,6 +46,18 @@ const FirstVisitContactModal = () => {
 
   const handleClose = () => {
     setIsVisible(false);
+    // Reset form when closing
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      destination: '',
+      travel_dates: '',
+      group_size: 1,
+      budget: '',
+      message: ''
+    });
+    setSubmitStatus('');
   };
 
   // Form validation function
@@ -100,7 +112,7 @@ const FirstVisitContactModal = () => {
         throw new Error(`Database connection failed: ${testError.message}`);
       }
 
-      // Insert the inquiry using the same structure as your contact page
+      // Insert the inquiry - REMOVED 'source' field that doesn't exist in database
       const { data, error } = await supabase
         .from('inquiries')
         .insert([{
@@ -113,12 +125,14 @@ const FirstVisitContactModal = () => {
           budget: formData.budget || null,
           message: formData.message.trim() || null,
           status: 'new'
+          // REMOVED: source: 'First Visit Popup' - field doesn't exist in database
         }])
         .select(); // Add select() to get back the inserted data
 
       console.log('Insert result:', { data, error }); // Debug log
 
       if (error) {
+        console.error('Supabase error details:', error);
         throw new Error(`Failed to save inquiry: ${error.message}`);
       }
 
@@ -134,6 +148,25 @@ const FirstVisitContactModal = () => {
       setIsSubmitting(false);
     }
   };
+
+  // Handle escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isVisible) {
+        handleClose();
+      }
+    };
+
+    if (isVisible) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isVisible]);
 
   if (!isVisible) return null;
 

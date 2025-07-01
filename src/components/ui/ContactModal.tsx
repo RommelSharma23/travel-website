@@ -93,8 +93,10 @@ const ContactModal: React.FC<ContactModalProps> = ({
     }
 
     try {
-      // Insert the inquiry - REMOVED unused 'data' variable
-      const { error } = await supabase
+      console.log('Submitting form data:', formData); // Debug log
+
+      // Insert the inquiry - REMOVED 'source' field that doesn't exist in database
+      const { data, error } = await supabase
         .from('inquiries')
         .insert([{
           name: formData.name.trim(),
@@ -105,12 +107,15 @@ const ContactModal: React.FC<ContactModalProps> = ({
           group_size: parseInt(formData.group_size.toString()),
           budget: formData.budget || null,
           message: formData.message.trim() || null,
-          source: source,
           status: 'new'
+          // REMOVED: source: source - field doesn't exist in database
         }])
         .select();
 
+      console.log('Insert result:', { data, error }); // Debug log
+
       if (error) {
+        console.error('Supabase error details:', error);
         throw new Error(`Failed to save inquiry: ${error.message}`);
       }
 
@@ -127,7 +132,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
     }
   };
 
-  // Handle escape key - FIXED: Added handleClose to dependency array
+  // Handle escape key
   React.useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
