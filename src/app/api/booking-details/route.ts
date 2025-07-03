@@ -4,19 +4,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
+// Create Supabase client with runtime environment variable checking
+function createSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error('Missing Supabase environment variables');
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false
     }
-  }
-);
+  });
+}
 
 export async function GET(request: NextRequest) {
   try {
+    const supabase = createSupabaseClient();
     const { searchParams } = new URL(request.url);
     const bookingId = searchParams.get('id');
     const paymentId = searchParams.get('payment');
@@ -161,7 +168,7 @@ export async function GET(request: NextRequest) {
         { 
           success: false, 
           error: 'Booking not found',
-          details: error?.message,
+          details: error?.message || 'No booking data found',
           searchParams: { bookingId, paymentId }
         },
         { status: 404 }
@@ -177,17 +184,17 @@ export async function GET(request: NextRequest) {
       ? booking.destinations[0]
       : null;
 
-    // Format response
+    // Format response with null safety
     const bookingDetails = {
       id: booking.id,
-      booking_reference: booking.booking_reference,
-      customer_name: booking.customer_name,
-      customer_email: booking.customer_email,
-      customer_phone: booking.customer_phone,
-      total_amount: booking.total_amount,
-      currency: booking.currency,
-      payment_type: booking.payment_type,
-      quick_payment_notes: booking.quick_payment_notes,
+      booking_reference: booking.booking_reference || 'N/A',
+      customer_name: booking.customer_name || 'Unknown',
+      customer_email: booking.customer_email || 'N/A',
+      customer_phone: booking.customer_phone || 'N/A',
+      total_amount: booking.total_amount || 0,
+      currency: booking.currency || 'INR',
+      payment_type: booking.payment_type || 'unknown',
+      quick_payment_notes: booking.quick_payment_notes || '',
       destination_name: destination?.name || 'Unknown',
       destination_country: destination?.country || 'Unknown',
       payment_id: payment?.razorpay_payment_id || paymentId || 'Unknown',
@@ -206,13 +213,43 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Booking details API error:', error);
+    
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    let statusCode = 500;
+    
+    if (errorMessage.includes('Missing Supabase')) {
+      statusCode = 500;
+    }
+
     return NextResponse.json(
       { 
         success: false, 
         error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: errorMessage
       },
-      { status: 500 }
+      { status: statusCode }
     );
   }
+}
+
+// Handle other HTTP methods
+export async function POST() {
+  return NextResponse.json(
+    { error: 'Method not allowed. Use GET request.' },
+    { status: 405 }
+  );
+}
+
+export async function PUT() {
+  return NextResponse.json(
+    { error: 'Method not allowed. Use GET request.' },
+    { status: 405 }
+  );
+}
+
+export async function DELETE() {
+  return NextResponse.json(
+    { error: 'Method not allowed. Use GET request.' },
+    { status: 405 }
+  );
 }
