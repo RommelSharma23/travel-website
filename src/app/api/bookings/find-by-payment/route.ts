@@ -4,27 +4,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// Environment variables validation
-if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable');
-}
+// Create Supabase client with runtime environment variable checking
+function createSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-  throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY environment variable');
-}
+  if (!supabaseUrl || !supabaseServiceKey) {
+    throw new Error('Missing Supabase environment variables');
+  }
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
-  {
+  return createClient(supabaseUrl, supabaseServiceKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false
     }
-  }
-);
+  });
+}
 
 async function findBookingByPaymentId(paymentId: string) {
+  const supabase = createSupabaseClient();
+  
   console.log('Finding booking by payment ID:', paymentId);
 
   // Find payment record first
@@ -113,7 +112,6 @@ async function findBookingByPaymentId(paymentId: string) {
   };
 
   console.log('Returning booking details for payment:', paymentId);
-
   return bookingDetails;
 }
 
@@ -148,20 +146,20 @@ export async function GET(request: NextRequest) {
       statusCode = 404;
     } else if (errorMessage.includes('not confirmed')) {
       statusCode = 400;
+    } else if (errorMessage.includes('Missing Supabase')) {
+      statusCode = 500;
     }
 
     return NextResponse.json(
       { 
         success: false, 
-        error: errorMessage,
-        details: errorMessage
+        error: errorMessage
       },
       { status: statusCode }
     );
   }
 }
 
-// Handle POST requests for consistency
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -174,7 +172,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use the same logic as GET instead of recursive call
     const bookingDetails = await findBookingByPaymentId(paymentId);
 
     return NextResponse.json({
@@ -188,7 +185,6 @@ export async function POST(request: NextRequest) {
     
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     
-    // Return appropriate status code based on error message
     let statusCode = 500;
     if (errorMessage.includes('not found')) {
       statusCode = 404;
@@ -201,8 +197,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         success: false, 
-        error: errorMessage,
-        details: errorMessage
+        error: errorMessage
       },
       { status: statusCode }
     );
