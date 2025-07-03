@@ -6,9 +6,21 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
 import { BRAND_ASSETS, COMPANY_INFO, NAVIGATION } from '@/lib/constants';
+import PayNowButton from '@/components/payments/PayNowButton';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handlePaymentSuccess = (bookingId: string, paymentId: string) => {
+    // Redirect to success page
+    window.location.href = `/payment-success?booking=${bookingId}&payment=${paymentId}`;
+  };
+
+  const handlePaymentError = (error: string) => {
+    // Show error notification
+    alert(`Payment failed: ${error}`);
+    // You can replace this with a proper toast notification later
+  };
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -43,8 +55,18 @@ export default function Header() {
             ))}
           </div>
 
-          {/* CTA Button */}
-          <div className="ml-10 hidden lg:block">
+          {/* Desktop CTA Buttons */}
+          <div className="ml-10 hidden lg:flex items-center space-x-3">
+            {/* Pay Now Button */}
+            <PayNowButton 
+              variant="secondary"
+              size="md"
+              onSuccess={handlePaymentSuccess}
+              onError={handlePaymentError}
+              className="border-green-600 text-green-600 hover:bg-green-50"
+            />
+            
+            {/* Plan Your Trip Button */}
             <Link
               href="/contact"
               className="inline-block bg-indigo-600 py-2 px-4 border border-transparent rounded-md text-base font-medium text-white hover:bg-indigo-700 transition-colors duration-200"
@@ -84,13 +106,25 @@ export default function Header() {
                   {link.name}
                 </Link>
               ))}
-              <Link
-                href="/contact"
-                className="block mt-4 bg-indigo-600 py-2 px-3 border border-transparent rounded-md text-base font-medium text-white hover:bg-indigo-700 transition-colors duration-200"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Plan Your Trip
-              </Link>
+              
+              {/* Mobile CTA Buttons */}
+              <div className="flex flex-col space-y-3 pt-4 border-t border-gray-200 mt-4">
+                <PayNowButton 
+                  variant="secondary"
+                  size="md"
+                  onSuccess={handlePaymentSuccess}
+                  onError={handlePaymentError}
+                  className="w-full justify-center border-green-600 text-green-600 hover:bg-green-50"
+                />
+                
+                <Link
+                  href="/contact"
+                  className="block bg-indigo-600 py-2 px-3 border border-transparent rounded-md text-base font-medium text-white hover:bg-indigo-700 transition-colors duration-200 text-center"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Plan Your Trip
+                </Link>
+              </div>
             </div>
           </div>
         )}
