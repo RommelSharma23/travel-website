@@ -265,19 +265,11 @@ export default function PaymentSuccessPage() {
               <div className="border-t border-gray-200 pt-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">What Happens Next?</h3>
                 <div className="space-y-4">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                      <span className="text-sm font-semibold text-blue-600">1</span>
-                    </div>
-                    <div>
-                      <p className="text-gray-900 font-medium">Email Confirmation</p>
-                      <p className="text-gray-600 text-sm">A detailed confirmation email has been sent to {booking.customer_email}</p>
-                    </div>
-                  </div>
+                
                   
                   <div className="flex items-start">
                     <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                      <span className="text-sm font-semibold text-blue-600">2</span>
+                      <span className="text-sm font-semibold text-blue-600">1</span>
                     </div>
                     <div>
                       <p className="text-gray-900 font-medium">Team Contact</p>
@@ -287,7 +279,7 @@ export default function PaymentSuccessPage() {
                   
                   <div className="flex items-start">
                     <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                      <span className="text-sm font-semibold text-blue-600">3</span>
+                      <span className="text-sm font-semibold text-blue-600">2</span>
                     </div>
                     <div>
                       <p className="text-gray-900 font-medium">Booking Finalization</p>
@@ -297,7 +289,7 @@ export default function PaymentSuccessPage() {
                   
                   <div className="flex items-start">
                     <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                      <span className="text-sm font-semibold text-blue-600">4</span>
+                      <span className="text-sm font-semibold text-blue-600">3</span>
                     </div>
                     <div>
                       <p className="text-gray-900 font-medium">Travel Documentation</p>
@@ -321,12 +313,12 @@ export default function PaymentSuccessPage() {
               <div className="flex flex-col items-center">
                 <Mail className="w-8 h-8 text-blue-600 mb-2" />
                 <p className="text-sm font-medium text-gray-900">Email Us</p>
-                <p className="text-sm text-gray-600">info@yourtravelcompany.com</p>
+                <p className="text-sm text-gray-600">support@getawayvibe.com</p>
               </div>
               <div className="flex flex-col items-center">
                 <Clock className="w-8 h-8 text-blue-600 mb-2" />
                 <p className="text-sm font-medium text-gray-900">Support Hours</p>
-                <p className="text-sm text-gray-600">9 AM - 8 PM (Mon-Sun)</p>
+                <p className="text-sm text-gray-600">9 AM - 8 PM (Mon-Sat)</p>
               </div>
             </div>
           </div>
@@ -377,7 +369,7 @@ export default function PaymentSuccessPage() {
           {/* Footer */}
           <div className="text-center mt-8 text-gray-500 text-sm">
             <p>Thank you for choosing us for your travel needs!</p>
-            <p className="mt-2">© 2025 Your Travel Company. All rights reserved.</p>
+            <p className="mt-2">© 2025 GetAway Vibe. All rights reserved.</p>
           </div>
         </div>
       </div>

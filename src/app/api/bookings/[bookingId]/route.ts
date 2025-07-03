@@ -1,13 +1,20 @@
 // app/api/bookings/[bookingId]/route.ts
-// This file handles: GET /api/bookings/{bookingId}?payment={paymentId}
-
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+// Environment variables validation
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL environment variable');
+}
+
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY environment variable');
+}
+
 // Use service role client for reading booking details
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
   {
     auth: {
       autoRefreshToken: false,
@@ -22,6 +29,7 @@ export async function GET(
 ) {
   try {
     const { bookingId } = params;
+    
     const { searchParams } = new URL(request.url);
     const paymentId = searchParams.get('payment');
 
@@ -87,7 +95,7 @@ export async function GET(
         { 
           success: false, 
           error: 'Booking not found',
-          details: bookingError?.message,
+          details: bookingError?.message || 'No booking data returned',
           bookingId 
         },
         { status: 404 }
@@ -120,7 +128,7 @@ export async function GET(
           success: false, 
           error: 'Payment ID does not match booking',
           expected: paymentId,
-          actual: payment?.razorpay_payment_id
+          actual: payment?.razorpay_payment_id || 'No payment found'
         },
         { status: 400 }
       );
@@ -146,14 +154,14 @@ export async function GET(
     // Format the response
     const bookingDetails = {
       id: booking.id,
-      booking_reference: booking.booking_reference,
-      customer_name: booking.customer_name,
-      customer_email: booking.customer_email,
-      customer_phone: booking.customer_phone,
-      total_amount: booking.total_amount,
-      currency: booking.currency,
-      payment_type: booking.payment_type,
-      quick_payment_notes: booking.quick_payment_notes,
+      booking_reference: booking.booking_reference || 'N/A',
+      customer_name: booking.customer_name || 'Unknown',
+      customer_email: booking.customer_email || 'N/A',
+      customer_phone: booking.customer_phone || 'N/A',
+      total_amount: booking.total_amount || 0,
+      currency: booking.currency || 'INR',
+      payment_type: booking.payment_type || 'unknown',
+      quick_payment_notes: booking.quick_payment_notes || '',
       destination_name: destination?.name || 'Unknown',
       destination_country: destination?.country || 'Unknown',
       payment_id: payment?.razorpay_payment_id || 'Unknown',
@@ -173,34 +181,35 @@ export async function GET(
 
   } catch (error) {
     console.error('Fetch booking error:', error);
+    
     return NextResponse.json(
       { 
         success: false, 
         error: 'Internal server error', 
         details: error instanceof Error ? error.message : 'Unknown error',
-        bookingId: params?.bookingId 
+        bookingId: params?.bookingId || 'unknown'
       },
       { status: 500 }
     );
   }
 }
 
-// Handle other HTTP methods
-export async function POST(request: NextRequest) {
+// Handle other HTTP methods with proper typing
+export async function POST() {
   return NextResponse.json(
     { error: 'Method not allowed. Use GET request.' },
     { status: 405 }
   );
 }
 
-export async function PUT(request: NextRequest) {
+export async function PUT() {
   return NextResponse.json(
     { error: 'Method not allowed. Use GET request.' },
     { status: 405 }
   );
 }
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE() {
   return NextResponse.json(
     { error: 'Method not allowed. Use GET request.' },
     { status: 405 }
