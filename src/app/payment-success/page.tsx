@@ -1,7 +1,7 @@
 // app/payment-success/page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle, Download, Mail, Phone, Home, FileText, Clock, Users, MapPin } from 'lucide-react';
 import Link from 'next/link';
@@ -22,7 +22,20 @@ interface BookingDetails {
   quick_payment_notes?: string;
 }
 
-export default function PaymentSuccessPage() {
+// Loading component for Suspense boundary
+function LoadingSpinner() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Loading booking details...</p>
+      </div>
+    </div>
+  );
+}
+
+// Main component that uses useSearchParams
+function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const bookingId = searchParams.get('booking');
   const paymentId = searchParams.get('payment');
@@ -74,14 +87,7 @@ export default function PaymentSuccessPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading booking details...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (error) {
@@ -265,8 +271,6 @@ export default function PaymentSuccessPage() {
               <div className="border-t border-gray-200 pt-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">What Happens Next?</h3>
                 <div className="space-y-4">
-                
-                  
                   <div className="flex items-start">
                     <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
                       <span className="text-sm font-semibold text-blue-600">1</span>
@@ -308,7 +312,7 @@ export default function PaymentSuccessPage() {
               <div className="flex flex-col items-center">
                 <Phone className="w-8 h-8 text-blue-600 mb-2" />
                 <p className="text-sm font-medium text-gray-900">Call Us</p>
-                <p className="text-sm text-gray-600">+91-9876543210</p>
+                <p className="text-sm text-gray-600">+91 7877995497</p>
               </div>
               <div className="flex flex-col items-center">
                 <Mail className="w-8 h-8 text-blue-600 mb-2" />
@@ -318,7 +322,7 @@ export default function PaymentSuccessPage() {
               <div className="flex flex-col items-center">
                 <Clock className="w-8 h-8 text-blue-600 mb-2" />
                 <p className="text-sm font-medium text-gray-900">Support Hours</p>
-                <p className="text-sm text-gray-600">9 AM - 8 PM (Mon-Sat)</p>
+                <p className="text-sm text-gray-600">9 AM - 8 PM (Mon-Sun)</p>
               </div>
             </div>
           </div>
@@ -368,11 +372,20 @@ export default function PaymentSuccessPage() {
 
           {/* Footer */}
           <div className="text-center mt-8 text-gray-500 text-sm">
-            <p>Thank you for choosing us for your travel needs!</p>
+            <p>Thank you for choosing GetAway Vibe for your travel needs!</p>
             <p className="mt-2">© 2025 GetAway Vibe. All rights reserved.</p>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+// Main exported component with Suspense wrapper
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }
