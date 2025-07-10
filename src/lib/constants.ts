@@ -43,7 +43,7 @@ export const COMPANY_INFO = {
   NAME: 'GetAway Vibe',
   TAGLINE: 'Your Vibe Your Journey Your Getaway',
   LOCATION: 'Jaipur, Rajasthan, India',
-  PHONE: '+91 XXX XXX XXXX', // Update with your actual number
+  PHONE: '+91 7877995497', // Update with your actual number
   EMAIL: 'info@getawayvibe.com', // Update with your actual email
   GST: 'XXXXXXXXXXXXXXX', // Update with your actual GST number
   

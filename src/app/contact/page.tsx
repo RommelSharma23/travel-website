@@ -3,8 +3,107 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Button } from '@/components/ui/Button';
-import { Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Star, ExternalLink, ThumbsUp } from 'lucide-react';
+
+const GOOGLE_REVIEW_URL = 'https://www.google.com/search?q=GetAway+Vibe&stick=H4sIAAAAAAAA_-NgU1I1qLBISTVLTUpKTE00TU1MMTO2MqhINbNMNE8zTDY0MU01NDMyWsTK455a4lieWKkQlpmUCgC9AljPOAAAAA&hl=en-GB#lrd=0x8dd8eababe1ed63:0x26e97f1c5c85a21,3';
+
+// Contact Success with Review CTA Component
+const ContactSuccessReviewCTA = () => {
+  const handleReviewClick = () => {
+    window.open(GOOGLE_REVIEW_URL, '_blank', 'noopener,noreferrer');
+  };
+
+  return (
+    <div className="text-center py-8">
+      <div className="bg-green-100 text-green-800 p-6 rounded-lg mb-6">
+        <ThumbsUp className="w-8 h-8 mx-auto mb-3 text-green-600" />
+        <h3 className="font-semibold mb-2 text-lg">Thank you for your inquiry!</h3>
+        <p className="mb-4">We'll get back to you within 24 hours with a personalized quote.</p>
+        
+        {/* Review CTA */}
+        <div className="mt-6 pt-4 border-t border-green-200">
+          <p className="text-sm mb-4">
+            🌟 <strong>Love our service?</strong> Help other travelers discover us by sharing your experience!
+          </p>
+          <button
+            onClick={handleReviewClick}
+            className="inline-flex items-center px-4 py-2 bg-white text-green-700 border border-green-300 rounded-lg hover:bg-green-50 transition-colors duration-200 font-medium"
+          >
+            <Star className="w-4 h-4 mr-2" />
+            Leave a Google Review
+            <ExternalLink className="w-3 h-3 ml-2" />
+          </button>
+        </div>
+      </div>
+      
+      <button 
+        onClick={() => window.location.reload()}
+        className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200"
+      >
+        Send Another Message
+      </button>
+    </div>
+  );
+};
+
+// Mini Reviews Display Component
+const MiniReviewsDisplay = () => {
+  const miniReviews = [
+    { name: "Ashwarya K.", rating: 5, text: "Amazing service! Perfect trip planning." },
+    { name: "Akshay A.", rating: 5, text: "Outstanding execution. Highly recommended!" },
+    { name: "Mudit G.", rating: 5, text: "Best travel agency in Jaipur!" }
+  ];
+
+  const handleReviewClick = () => {
+    window.open(GOOGLE_REVIEW_URL, '_blank', 'noopener,noreferrer');
+  };
+
+  return (
+    <div className="bg-blue-50 rounded-lg p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-semibold text-gray-900">Recent Reviews</h3>
+        <div className="flex items-center">
+          <div className="flex">
+            {[1,2,3,4,5].map(star => (
+              <Star key={star} className="w-4 h-4 text-yellow-400 fill-current" />
+            ))}
+          </div>
+          <span className="ml-2 text-sm text-gray-600">5.0 (50+ reviews)</span>
+        </div>
+      </div>
+      
+      <div className="space-y-3 mb-4">
+        {miniReviews.map((review, index) => (
+          <div key={index} className="flex items-start space-x-3">
+            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+              {review.name.charAt(0)}
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center space-x-2">
+                <span className="font-medium text-sm">{review.name}</span>
+                <div className="flex">
+                  {[1,2,3,4,5].map(star => (
+                    <Star key={star} className="w-3 h-3 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mt-1">"{review.text}"</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <button
+        onClick={handleReviewClick}
+        className="w-full justify-center inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
+      >
+        <Star className="w-4 h-4 mr-2" />
+        Leave Google Review
+        <ExternalLink className="w-3 h-3 ml-2" />
+      </button>
+    </div>
+  );
+};
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -162,7 +261,12 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">Email Us</h3>
-                    <p className="text-gray-600">info@getawayvibe.com</p>
+                    <a 
+                      href="mailto:info@getawayvibe.com"
+                      className="text-gray-600 hover:text-blue-600 transition-colors"
+                    >
+                      info@getawayvibe.com
+                    </a>
                     <p className="text-sm text-gray-500">We'll respond within 24 hours</p>
                   </div>
                 </div>
@@ -173,8 +277,13 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">Call Us</h3>
-                    <p className="text-gray-600">+1 (555) 123-4567</p>
-                    <p className="text-sm text-gray-500">Mon-Fri, 9AM-6PM EST</p>
+                    <a 
+                      href="tel:+917877995497"
+                      className="text-gray-600 hover:text-blue-600 transition-colors"
+                    >
+                      +91 7877995497
+                    </a>
+                    <p className="text-sm text-gray-500">Mon-Sat, 9AM-7PM IST</p>
                   </div>
                 </div>
 
@@ -184,7 +293,8 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">Visit Us</h3>
-                    <p className="text-gray-600">123 Travel Street<br />New York, NY 10001</p>
+                    <p className="text-gray-600">Jaipur, Rajasthan<br />India</p>
+                    <p className="text-sm text-gray-500">By appointment only</p>
                   </div>
                 </div>
 
@@ -194,24 +304,35 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">Business Hours</h3>
-                    <p className="text-gray-600">Monday - Friday: 9:00 AM - 6:00 PM</p>
-                    <p className="text-gray-600">Saturday: 10:00 AM - 4:00 PM</p>
+                    <p className="text-gray-600">Monday - Saturday: 9:00 AM - 7:00 PM IST</p>
                     <p className="text-gray-600">Sunday: Closed</p>
+                    <p className="text-sm text-gray-500 mt-1">Emergency support available 24/7</p>
                   </div>
                 </div>
+              </div>
+
+              {/* Additional Info */}
+              <div className="mt-8 p-6 bg-blue-50 rounded-lg">
+                <h3 className="font-semibold text-gray-900 mb-3">Why Choose GetAway Vibe?</h3>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li>• Personalized travel planning</li>
+                  <li>• 24/7 emergency support during travel</li>
+                  <li>• Competitive pricing with no hidden costs</li>
+                  <li>• Local expertise and authentic experiences</li>
+                  <li>• Hassle-free booking and documentation</li>
+                </ul>
+              </div>
+
+              {/* Add Mini Reviews Display */}
+              <div className="mt-8">
+                <MiniReviewsDisplay />
               </div>
             </div>
 
             {/* Contact Form */}
             <div className="bg-white rounded-xl shadow-lg p-8">
               {success ? (
-                <div className="text-center py-8">
-                  <div className="bg-green-100 text-green-800 p-4 rounded-lg mb-4">
-                    <h3 className="font-semibold mb-2">Thank you for your inquiry!</h3>
-                    <p>We'll get back to you within 24 hours with a personalized quote.</p>
-                  </div>
-                  <Button onClick={() => setSuccess(false)}>Send Another Message</Button>
-                </div>
+                <ContactSuccessReviewCTA />
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">Send Us a Message</h2>
@@ -347,13 +468,17 @@ export default function ContactPage() {
                     />
                   </div>
 
-                  <Button
+                  <button
                     type="submit"
-                    className="w-full text-lg py-3"
+                    className={`w-full text-lg py-3 px-6 rounded-lg font-semibold transition-colors duration-200 ${
+                      loading 
+                        ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                        : 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500'
+                    }`}
                     disabled={loading}
                   >
                     {loading ? 'Sending...' : 'Send My Inquiry'}
-                  </Button>
+                  </button>
                 </form>
               )}
             </div>
