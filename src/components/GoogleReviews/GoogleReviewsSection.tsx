@@ -9,7 +9,8 @@ import { Star, ExternalLink, Users, MessageCircle, Loader2 } from 'lucide-react'
 const GOOGLE_CONFIG = {
   placeId: 'ChIJY61e6rrr5o0RIhZeFBx_muY',
   businessName: 'GetAway Vibe',
-  reviewUrl: 'https://www.google.com/search?q=GetAway+Vibe&stick=H4sIAAAAAAAA_-NgU1I1qLBISTVLTUpKTE00TU1MMTO2MqhINbNMNE8zTDY0MU01NDMyWsTK455a4lieWKkQlpmUCgC9AljPOAAAAA&hl=en-GB#lrd=0x8dd8eababe1ed63:0x26e97f1c5c85a21,3'
+  writeReviewUrl: 'https://search.google.com/local/writereview?placeid=ChIJY61e6rrr5o0RIhZeFBx_muY',
+  viewReviewsUrl: 'https://www.google.com/maps/place/?q=place_id:ChIJY61e6rrr5o0RIhZeFBx_muY'
 };
 
 // Enhanced Review Interface
@@ -125,7 +126,7 @@ const ReviewCard = ({ review, index }: { review: Review; index: number }) => {
 // Leave Review Button Component
 const LeaveReviewButton = ({ variant = 'primary' }: { variant?: 'primary' | 'secondary' }) => {
   const handleReviewClick = () => {
-    window.open(GOOGLE_CONFIG.reviewUrl, '_blank', 'noopener,noreferrer');
+    window.open(GOOGLE_CONFIG.writeReviewUrl, '_blank', 'noopener,noreferrer');
   };
 
   const baseClasses = "inline-flex items-center px-6 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105";
@@ -353,7 +354,7 @@ const GoogleReviewsSection = () => {
         {/* View All Reviews Link */}
         <div className="text-center mt-8">
           <button
-            onClick={() => window.open(GOOGLE_CONFIG.reviewUrl, '_blank')}
+            onClick={() => window.open(GOOGLE_CONFIG.viewReviewsUrl, '_blank')}
             className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
           >
             View All Reviews on Google →

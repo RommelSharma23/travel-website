@@ -4,7 +4,7 @@
 import React from 'react';
 import { Star, ExternalLink, ThumbsUp } from 'lucide-react';
 
-const GOOGLE_REVIEW_URL = 'https://www.google.com/search?q=GetAway+Vibe&stick=H4sIAAAAAAAA_-NgU1I1qLBISTVLTUpKTE00TU1MMTO2MqhINbNMNE8zTDY0MU01NDMyWsTK455a4lieWKkQlpmUCgC9AljPOAAAAA&hl=en-GB#lrd=0x8dd8eababe1ed63:0x26e97f1c5c85a21,3';
+const GOOGLE_REVIEW_URL = 'https://search.google.com/local/writereview?placeid=ChIJY61e6rrr5o0RIhZeFBx_muY';
 
 // Component for Contact Page Success State
 export const ContactSuccessReviewCTA = () => {
