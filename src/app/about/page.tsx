@@ -9,30 +9,6 @@ export default function AboutPage() {
     { icon: Heart, value: '98%', label: 'Customer Satisfaction' }
   ];
 
-<<<<<<< HEAD
-=======
-  const team = [
-  {
-    name: 'Sarah Johnson',
-    role: 'Founder & CEO',
-    image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=face',
-    bio: '15+ years in luxury travel with a passion for creating unforgettable experiences.'
-  },
-    {
-      name: 'Michael Chen',
-      role: 'Head of Operations',
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
-      bio: 'Expert in travel logistics and customer service excellence.'
-    },
-    {
-      name: 'Emma Rodriguez',
-      role: 'Travel Curator',
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
-      bio: 'Discovers and curates unique destinations and authentic experiences.'
-    }
-  ];
-
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -55,11 +31,7 @@ export default function AboutPage() {
             <div>
               <h2 className="text-4xl font-bold text-gray-900 mb-6">Our Story</h2>
               <p className="text-lg text-gray-600 mb-4">
-<<<<<<< HEAD
                 Founded in 2020, Get Away Vibe was born from a simple belief: travel should be 
-=======
-                Founded in 2008, Get Away Vibe was born from a simple belief: travel should be 
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
                 transformative, not just transactional. We started as a small team of passionate 
                 travelers who wanted to share the world&apos;s hidden gems with fellow adventurers.
               </p>
@@ -104,44 +76,10 @@ export default function AboutPage() {
         </div>
       </section>
 
-<<<<<<< HEAD
       {/* Values */}
       <section className="py-20 bg-white">
         <div className="container-width section-padding">
           <div className="text-center mb-12">
-=======
-      {/* Team */}
-      <section className="py-20 bg-white">
-        <div className="container-width section-padding">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Meet Our Team</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Our experienced team of travel experts is dedicated to making your dream trip a reality
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {team.map((member) => (
-              <div key={member.name} className="text-center">
-                <img 
-                  src={member.image}
-                  alt={member.name}
-                  className="w-32 h-32 rounded-full mx-auto mb-4 shadow-lg"
-                />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{member.name}</h3>
-                <p className="text-blue-600 font-medium mb-3">{member.role}</p>
-                <p className="text-gray-600">{member.bio}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Values */}
-      <section className="py-20 bg-gray-50">
-        <div className="container-width section-padding">
-          <div className="text-center mb-12">
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Values</h2>
           </div>
 
