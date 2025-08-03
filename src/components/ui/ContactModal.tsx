@@ -1,37 +1,17 @@
 // components/ui/ContactModal.tsx
-<<<<<<< HEAD
 'use client';
 
 import React, { useState, useEffect } from 'react';
-=======
-
-'use client';
-
-import React, { useState, useCallback } from 'react';
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
 import { X, MapPin, Calendar, Users, MessageCircle, Send, Plane } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface ContactModalProps {
-<<<<<<< HEAD
   isVisible: boolean;
   onClose: () => void;
   prefilledDestination?: string;
 }
 
 const ContactModal = ({ isVisible, onClose, prefilledDestination = '' }: ContactModalProps) => {
-=======
-  isOpen: boolean;
-  onClose: () => void;
-  source?: string;
-}
-
-const ContactModal: React.FC<ContactModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  source = 'Contact Modal' 
-}) => {
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('');
   const [formData, setFormData] = useState({
@@ -45,7 +25,6 @@ const ContactModal: React.FC<ContactModalProps> = ({
     message: ''
   });
 
-<<<<<<< HEAD
   // Set prefilled destination when modal opens
   useEffect(() => {
     if (isVisible && prefilledDestination) {
@@ -56,8 +35,6 @@ const ContactModal: React.FC<ContactModalProps> = ({
     }
   }, [isVisible, prefilledDestination]);
 
-=======
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -66,12 +43,8 @@ const ContactModal: React.FC<ContactModalProps> = ({
     }));
   };
 
-<<<<<<< HEAD
   const handleClose = () => {
     onClose();
-=======
-  const handleClose = useCallback(() => {
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
     // Reset form when closing
     setFormData({
       name: '',
@@ -84,12 +57,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
       message: ''
     });
     setSubmitStatus('');
-<<<<<<< HEAD
   };
-=======
-    onClose();
-  }, [onClose]);
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
 
   // Form validation function
   const validateForm = () => {
@@ -132,7 +100,6 @@ const ContactModal: React.FC<ContactModalProps> = ({
     try {
       console.log('Submitting form data:', formData); // Debug log
 
-<<<<<<< HEAD
       // Test Supabase connection first
       const { data: testData, error: testError } = await supabase
         .from('inquiries')
@@ -145,9 +112,6 @@ const ContactModal: React.FC<ContactModalProps> = ({
       }
 
       // Insert the inquiry
-=======
-      // Insert the inquiry - REMOVED 'source' field that doesn't exist in database
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
       const { data, error } = await supabase
         .from('inquiries')
         .insert([{
@@ -160,14 +124,8 @@ const ContactModal: React.FC<ContactModalProps> = ({
           budget: formData.budget || null,
           message: formData.message.trim() || null,
           status: 'new'
-<<<<<<< HEAD
         }])
         .select(); // Add select() to get back the inserted data
-=======
-          // REMOVED: source: source - field doesn't exist in database
-        }])
-        .select();
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
 
       console.log('Insert result:', { data, error }); // Debug log
 
@@ -190,24 +148,14 @@ const ContactModal: React.FC<ContactModalProps> = ({
   };
 
   // Handle escape key
-<<<<<<< HEAD
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isVisible) {
-=======
-  React.useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
         handleClose();
       }
     };
 
-<<<<<<< HEAD
     if (isVisible) {
-=======
-    if (isOpen) {
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
       document.addEventListener('keydown', handleEscape);
       document.body.style.overflow = 'hidden';
     }
@@ -216,15 +164,9 @@ const ContactModal: React.FC<ContactModalProps> = ({
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'unset';
     };
-<<<<<<< HEAD
   }, [isVisible]);
 
   if (!isVisible) return null;
-=======
-  }, [isOpen, handleClose]);
-
-  if (!isOpen) return null;
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 backdrop-blur-sm">
@@ -243,13 +185,9 @@ const ContactModal: React.FC<ContactModalProps> = ({
               <Plane className="w-6 h-6" />
             </div>
             <div>
-<<<<<<< HEAD
               <h2 className="text-xl font-bold">
                 {prefilledDestination ? `Plan Your ${prefilledDestination} Trip` : 'Plan Your Dream Trip'}
               </h2>
-=======
-              <h2 className="text-xl font-bold">Plan Your Trip</h2>
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
               <p className="text-sm opacity-90">Get a personalized travel quote in 24 hours</p>
             </div>
           </div>
@@ -259,11 +197,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {submitStatus === 'success' && (
             <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-<<<<<<< HEAD
               <p className="text-green-800 font-medium">Thank you! We'll get back to you within 24 hours.</p>
-=======
-              <p className="text-green-800 font-medium">Thank you! {`We'll`} get back to you within 24 hours.</p>
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
             </div>
           )}
 
@@ -321,19 +255,14 @@ const ContactModal: React.FC<ContactModalProps> = ({
             </h3>
 
             <div>
-<<<<<<< HEAD
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {prefilledDestination ? 'Preferred Destination (you can change this)' : 'Preferred Destination'}
               </label>
-=======
-              <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Destination</label>
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
               <input
                 type="text"
                 name="destination"
                 value={formData.destination}
                 onChange={handleInputChange}
-<<<<<<< HEAD
                 className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                   prefilledDestination ? 'bg-blue-50 border-blue-200' : ''
                 }`}
@@ -344,11 +273,6 @@ const ContactModal: React.FC<ContactModalProps> = ({
                  
                 </p>
               )}
-=======
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="e.g., Bali, Paris, Japan"
-              />
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
@@ -412,15 +336,11 @@ const ContactModal: React.FC<ContactModalProps> = ({
                 value={formData.message}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-<<<<<<< HEAD
                 placeholder={
                   prefilledDestination 
                     ? `What kind of ${prefilledDestination} experience are you looking for? Any special requirements or preferences?`
                     : "What type of experience are you looking for? Any special requirements or preferences?"
                 }
-=======
-                placeholder="What type of experience are you looking for? Any special requirements or preferences?"
->>>>>>> da6460111d7c831013e362b170fc9db4654884e1
               />
             </div>
           </div>
