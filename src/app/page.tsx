@@ -1,4 +1,5 @@
 // src/app/page.tsx
+<<<<<<< HEAD
 'use client';
 
 import { useState } from 'react';
@@ -60,3 +61,22 @@ export default function HomePage() {
   );
 }
 
+=======
+import { HeroSection } from '@/components/sections/HeroSection';
+import { FeaturedDestinations } from '@/components/sections/FeaturedDestinations';
+import { TravelThemes } from '@/components/sections/TravelThemes';
+import GoogleReviewsSection from '@/components/GoogleReviews/GoogleReviewsSection';
+import FirstVisitContactModal from '@/components/ui/FirstVisitContactModal';
+
+export default function HomePage() {
+  return (
+    <>
+      <HeroSection />
+      <FeaturedDestinations />
+      <TravelThemes />
+      <GoogleReviewsSection />
+      <FirstVisitContactModal />
+    </>
+  );
+}
+>>>>>>> da6460111d7c831013e362b170fc9db4654884e1
