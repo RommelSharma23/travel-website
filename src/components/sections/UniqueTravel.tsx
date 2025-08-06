@@ -237,7 +237,7 @@ export const UniqueTravel = ({ onOpenContactForm }: UniqueTravelProps) => {
                 </div>
 
                 {/* Unique accent border */}
-                <div className={`absolute top-0 left-0 w-full h-1 ${getAccentBorder(index)}`}></div>
+              
               </motion.div>
             ))
           )}
@@ -318,15 +318,7 @@ const getButtonColor = (index: number): string => {
   return colors[index % colors.length];
 };
 
-const getAccentBorder = (index: number): string => {
-  const borders = [
-    'bg-gradient-to-r from-orange-400 to-red-400',
-    'bg-gradient-to-r from-cyan-400 to-blue-400',
-    'bg-gradient-to-r from-pink-400 to-purple-400', 
-    'bg-gradient-to-r from-green-400 to-emerald-400'
-  ];
-  return borders[index % borders.length];
-};
+
 
 const getFeatureColor = (index: number): string => {
   const colors = [

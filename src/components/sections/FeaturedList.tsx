@@ -7,6 +7,7 @@ import { useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import { MapPin, Star } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface Destination {
   id: number;
@@ -90,7 +91,15 @@ export const FeaturedList = ({ onOpenContactForm }: FeaturedListProps) => {
         .eq('status', 'published')
         .limit(4);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      if (!data || data.length === 0) {
+        setDestinations([]);
+        return;
+      }
       
       // Sort by the order we want them displayed
       const sortedData = featuredSlugs.map(slug => 
@@ -100,6 +109,7 @@ export const FeaturedList = ({ onOpenContactForm }: FeaturedListProps) => {
       setDestinations(sortedData);
     } catch (error) {
       console.error('Error fetching featured destinations:', error);
+      setDestinations([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -164,62 +174,56 @@ export const FeaturedList = ({ onOpenContactForm }: FeaturedListProps) => {
                 transition={{ duration: 0.6, delay: index * 0.15 + 0.4 }}
                 whileHover={{ scale: 1.02 }}
               >
-                <div className="relative h-64 overflow-hidden">
-                  <Image
-                    src={destination.hero_image || getDefaultImage(destination.slug)}
-                    alt={`${destination.name} - ${destination.country}`}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    quality={80}
-                  />
-                  
-                  {/* Enhanced gradient overlays for better text readability */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30 opacity-60" />
-                  
-                  {/* Location badge */}
-                  <div className="absolute top-4 left-4">
-                    <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center space-x-1">
-                      <MapPin className="h-3 w-3 text-white" />
-                      <span className="text-xs text-white font-medium">{destination.country}</span>
+                {/* Clickable Hero Image - Links to destination page */}
+                <Link href={`/destinations/${destination.slug}`} className="block">
+                  <div className="relative h-64 overflow-hidden cursor-pointer">
+                    <Image
+                      src={destination.hero_image || getDefaultImage(destination.slug)}
+                      alt={`${destination.name} - ${destination.country}`}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      quality={80}
+                      priority={index < 2} // Prioritize first 2 images
+                    />
+                    
+                    {/* Enhanced gradient overlays for better text readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30 opacity-60" />
+                    
+                    {/* Location badge */}
+                    <div className="absolute top-4 left-4">
+                      <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center space-x-1">
+                        <MapPin className="h-3 w-3 text-white" />
+                        <span className="text-xs text-white font-medium">{destination.country}</span>
+                      </div>
                     </div>
-                  </div>
-                  
-                  {/* Destination name overlay with specific pricing */}
-                  <div className="absolute bottom-4 left-4 text-white">
-                    <h3 className="text-xl font-bold drop-shadow-lg mb-1">{destination.name}</h3>
-                    <div className="flex items-center space-x-1 text-sm opacity-90">
-                      <span>Starting from</span>
-                      <span className="font-semibold text-lg">
-                        {formatPrice(getDestinationPrice(destination.slug))}
-                      </span>
+                    
+                    {/* Destination name overlay with specific pricing */}
+                    <div className="absolute bottom-4 left-4 text-white">
+                      <h3 className="text-xl font-bold drop-shadow-lg mb-1">{destination.name}</h3>
+                      <div className="flex items-center space-x-1 text-sm opacity-90">
+                        <span>Starting from</span>
+                        <span className="font-semibold text-lg">
+                          {formatPrice(getDestinationPrice(destination.slug))}
+                        </span>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Rating badge */}
-                  <div className="absolute top-4 right-4">
-                    <div className="bg-yellow-400 text-yellow-900 rounded-full px-2 py-1 flex items-center space-x-1 text-xs font-bold">
-                      <Star className="h-3 w-3 fill-current" />
-                      <span>4.8</span>
+                    {/* Rating badge */}
+                    <div className="absolute top-4 right-4">
+                      <div className="bg-yellow-400 text-yellow-900 rounded-full px-2 py-1 flex items-center space-x-1 text-xs font-bold">
+                        <Star className="h-3 w-3 fill-current" />
+                        <span>4.8</span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
                 
                 <div className="p-6">
-                  <p className="text-gray-600 mb-4 line-clamp-3 leading-relaxed text-sm">
+                  <p className="text-gray-600 mb-6 line-clamp-3 leading-relaxed text-sm">
                     {destination.description}
                   </p>
-                  
-                  {/* Quick info tags */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <span className="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs font-medium">
-                      7-14 Days
-                    </span>
-                    <span className="bg-green-100 text-green-600 px-2 py-1 rounded-full text-xs font-medium">
-                      All Inclusive
-                    </span>
-                  </div>
                   
                   {/* Get Quote button that opens contact form with destination pre-filled */}
                   <button 

@@ -1,7 +1,7 @@
 // src/components/sections/MyIndia.tsx
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { supabase } from '@/lib/supabase';
@@ -24,6 +24,7 @@ interface RobustImageProps {
   alt: string;
   className?: string;
   destinationName?: string;
+  priority?: boolean;
 }
 
 const RobustImage: React.FC<RobustImageProps> = ({ 
@@ -31,7 +32,8 @@ const RobustImage: React.FC<RobustImageProps> = ({
   fallbackSrc, 
   alt, 
   className = '',
-  destinationName = ''
+  destinationName = '',
+  priority = false
 }) => {
   const [imageSrc, setImageSrc] = useState<string>(src || fallbackSrc);
   const [hasError, setHasError] = useState(false);
@@ -43,21 +45,22 @@ const RobustImage: React.FC<RobustImageProps> = ({
     setImageSrc(finalSrc);
     setHasError(false);
     setIsLoading(true);
-    console.log(`🖼️ [${destinationName}] Using image:`, finalSrc);
+    
+    // Simple console log to show image source
+    if (destinationName) {
+      console.log(`${destinationName}: ${src ? 'Supabase' : 'Fallback'}`);
+    }
   }, [src, fallbackSrc, destinationName]);
 
   const handleError = () => {
-    console.log(`❌ [${destinationName}] Image failed:`, imageSrc);
     if (!hasError && imageSrc !== fallbackSrc) {
       setHasError(true);
       setImageSrc(fallbackSrc);
-      console.log(`🔄 [${destinationName}] Switching to fallback:`, fallbackSrc);
     }
   };
 
   const handleLoad = () => {
     setIsLoading(false);
-    console.log(`✅ [${destinationName}] Image loaded successfully:`, imageSrc);
   };
 
   return (
@@ -72,20 +75,16 @@ const RobustImage: React.FC<RobustImageProps> = ({
         className="object-cover group-hover:scale-110 transition-transform duration-700"
         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
         quality={85}
+        priority={priority}
         style={{ opacity: isLoading ? 0 : 1 }}
         onError={handleError}
         onLoad={handleLoad}
       />
-      
-      {/* Debug indicator - smaller and less intrusive */}
-      <div className="absolute top-2 left-2 bg-black/50 text-white text-xs px-1 py-0.5 rounded z-20 font-mono">
-        {hasError ? 'FB' : 'OK'}
-      </div>
     </div>
   );
 };
 
-// Loading Skeleton for Indian destination cards (Europe-style)
+// Loading Skeleton for Indian destination cards
 const IndiaSkeleton = ({ index }: { index: number }) => (
   <motion.div
     className="bg-white rounded-xl overflow-hidden shadow-lg"
@@ -131,42 +130,22 @@ export const MyIndia = ({ onOpenContactForm }: MyIndiaProps) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
 
-  // Indian destinations: Rishikesh, Goa, Ladakh, Himachal
-  const indiaSlugs = ['rishikesh-india', 'goa-india', 'ladakh-india', 'himachal-pradesh-india'];
-
   const fetchIndianDestinations = useCallback(async () => {
+    // Move indiaSlugs inside useCallback to fix dependency warning
+    const indiaSlugs = ['rishikesh-india', 'goa-india', 'ladakh-india', 'andaman-nicobar-india'];
+    
     try {
-      console.log('🔍 Fetching Indian destinations...');
-      
       const { data, error } = await supabase
         .from('destinations')
         .select('id, name, country, slug, description, hero_image')
         .in('slug', indiaSlugs)
-        .eq('is_active', true)
+        .eq('status', 'published')
         .limit(4);
 
       if (error) {
-        console.error('❌ Supabase error:', error);
+        console.error('Supabase error:', error);
         throw error;
       }
-      
-      console.log('📊 Raw data from Supabase:', data);
-      
-      // Debug log to see what images we're getting
-      console.log('=== INDIA DESTINATIONS DEBUG ===');
-      data?.forEach(dest => {
-        console.log(`${dest.name}:`, {
-          slug: dest.slug,
-          hero_image: dest.hero_image,
-          hero_image_type: typeof dest.hero_image,
-          hero_image_length: dest.hero_image?.length,
-          contains_null: dest.hero_image?.includes('NULL'),
-          is_valid_url: dest.hero_image?.startsWith('http'),
-          is_null: dest.hero_image === null,
-          is_empty: dest.hero_image === ''
-        });
-      });
-      console.log('================================');
       
       // Sort by the order we want them displayed and add fallbacks for missing destinations
       const sortedData: Destination[] = [];
@@ -177,30 +156,29 @@ export const MyIndia = ({ onOpenContactForm }: MyIndiaProps) => {
           sortedData.push(found);
         } else {
           // Create a placeholder destination if not found in database
-          console.log(`⚠️ Creating placeholder for missing destination: ${slug}`);
           sortedData.push(createPlaceholderDestination(slug));
         }
       });
       
-      console.log('✅ Final destinations array:', sortedData);
       setDestinations(sortedData);
     } catch (error) {
-      console.error('❌ Error fetching Indian destinations:', error);
+      console.error('Error fetching Indian destinations:', error);
       // Create placeholder destinations for all if database fails
+      const indiaSlugs = ['rishikesh-india', 'goa-india', 'ladakh-india', 'andaman-nicobar-india'];
       const placeholderDestinations = indiaSlugs.map(createPlaceholderDestination);
       setDestinations(placeholderDestinations);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, []); // Empty dependencies - stable!
 
   useEffect(() => {
     fetchIndianDestinations();
   }, [fetchIndianDestinations]);
 
-  // Indian experience themes
-  const indianThemes = ['Spiritual', 'Beach Bliss', 'High Altitude', 'Mountain Retreat'];
-  const indianIcons = [Mountain, Waves, Mountain, Mountain];
+  // Indian experience themes - memoized to avoid recreating
+  const indianThemes = useMemo(() => ['Spiritual', 'Beach Bliss', 'High Altitude', 'Island Paradise'], []);
+  const indianIcons = useMemo(() => [Mountain, Waves, Mountain, Waves], []);
 
   return (
     <motion.section 
@@ -246,11 +224,11 @@ export const MyIndia = ({ onOpenContactForm }: MyIndiaProps) => {
             My <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 via-white to-green-600">India</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Discover the diverse beauty of India - from spiritual mountains to pristine beaches, every corner tells a story
+            Discover the diverse beauty of India - from spiritual mountains to pristine beaches and tropical islands
           </p>
         </motion.div>
 
-        {/* 4 Indian destination cards - Europe Style */}
+        {/* 4 Indian destination cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {loading ? (
             Array.from({ length: 4 }).map((_, index) => (
@@ -261,11 +239,6 @@ export const MyIndia = ({ onOpenContactForm }: MyIndiaProps) => {
               const IconComponent = indianIcons[index % indianIcons.length];
               const fallbackImage = getFallbackImage(destination.slug);
               
-              console.log(`🎨 Rendering ${destination.name} card with:`, {
-                hero_image: destination.hero_image,
-                fallback: fallbackImage
-              });
-              
               return (
                 <motion.div
                   key={destination.id}
@@ -275,7 +248,7 @@ export const MyIndia = ({ onOpenContactForm }: MyIndiaProps) => {
                   transition={{ duration: 0.6, delay: index * 0.15 + 0.4 }}
                   whileHover={{ scale: 1.02 }}
                 >
-                  {/* Europe-style image container with exact same height */}
+                  {/* Image container with priority for first image */}
                   <div className="relative h-72 overflow-hidden">
                     <RobustImage
                       src={destination.hero_image}
@@ -283,13 +256,14 @@ export const MyIndia = ({ onOpenContactForm }: MyIndiaProps) => {
                       alt={`${destination.name} - ${destination.country}`}
                       className="h-full"
                       destinationName={destination.name}
+                      priority={index < 2} // Add priority for first 2 images to fix LCP warning
                     />
                     
-                    {/* Enhanced Indian-style gradient overlays (Europe pattern) */}
+                    {/* Enhanced Indian-style gradient overlays */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
                     <div className={`absolute inset-0 ${getIndianGradientOverlay(index)}`} />
                     
-                    {/* Indian theme badge (Europe style - simplified) */}
+                    {/* Indian theme badge */}
                     <div className="absolute top-4 left-4">
                       <div className="bg-white/25 backdrop-blur-md rounded-full px-3 py-1 border border-white/30">
                         <span className="text-xs text-white font-semibold tracking-wide">
@@ -298,14 +272,14 @@ export const MyIndia = ({ onOpenContactForm }: MyIndiaProps) => {
                       </div>
                     </div>
                     
-                    {/* Best time to visit (Europe style) */}
+                    {/* Best time to visit */}
                     <div className="absolute top-4 right-4">
                       <div className={`${getSeasonColor(index)} text-white rounded-full p-2 shadow-lg`}>
                         <Calendar className="h-4 w-4" />
                       </div>
                     </div>
                     
-                    {/* Destination info overlay (Europe style - cleaner) */}
+                    {/* Destination info overlay */}
                     <div className="absolute bottom-4 left-4 right-4 text-white">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-1 text-sm opacity-90">
@@ -321,13 +295,13 @@ export const MyIndia = ({ onOpenContactForm }: MyIndiaProps) => {
                     </div>
                   </div>
                   
-                  {/* Europe-style content section */}
+                  {/* Content section */}
                   <div className="p-6">
                     <p className="text-gray-600 mb-4 line-clamp-3 leading-relaxed text-sm">
                       {destination.description}
                     </p>
                     
-                    {/* Indian experience features (Europe style - simpler) */}
+                    {/* Indian experience features */}
                     <div className="flex flex-wrap gap-2 mb-4">
                       {getIndianFeatures(destination.slug).map((feature, idx) => (
                         <span key={idx} className={`${getIndianFeatureColor(index)} px-3 py-1 rounded-full text-xs font-medium`}>
@@ -336,7 +310,7 @@ export const MyIndia = ({ onOpenContactForm }: MyIndiaProps) => {
                       ))}
                     </div>
                     
-                    {/* Indian experience highlights (Europe style) */}
+                    {/* Indian experience highlights */}
                     <div className="mb-4 text-sm text-gray-500">
                       <div className="flex items-center space-x-4">
                         <span>{getIndianExperienceIcon(destination.slug)} {getIndianExperience(destination.slug)}</span>
@@ -344,7 +318,7 @@ export const MyIndia = ({ onOpenContactForm }: MyIndiaProps) => {
                       </div>
                     </div>
                     
-                    {/* Get Quote button (Europe style) */}
+                    {/* Get Quote button */}
                     <button 
                       onClick={() => onOpenContactForm(destination.name)}
                       className={`w-full ${getIndianButtonColor(index)} text-white py-3 rounded-lg transition-all duration-300 flex items-center justify-center space-x-2 group-hover:shadow-lg font-medium`}
@@ -352,16 +326,13 @@ export const MyIndia = ({ onOpenContactForm }: MyIndiaProps) => {
                       <span>Get Quote</span>
                     </button>
                   </div>
-
-                  {/* Indian tricolor accent (Europe style - top accent) */}
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 via-white to-green-400"></div>
                 </motion.div>
               );
             })
           )}
         </div>
 
-        {/* Incredible India inspiration (Europe style - simplified) */}
+        {/* Incredible India inspiration */}
         <motion.div 
           className="text-center mt-16"
           initial={{ opacity: 0, y: 20 }}
@@ -406,14 +377,14 @@ const createPlaceholderDestination = (slug: string): Destination => {
       name: 'Ladakh',
       description: 'The land of high passes, offering breathtaking landscapes, Buddhist monasteries, and adventure at high altitude.'
     },
-    'himachal-pradesh-india': {
-      name: 'Himachal Pradesh',
-      description: 'The land of gods, featuring snow-capped mountains, hill stations, and spiritual retreats in the Himalayas.'
+    'andaman-nicobar-india': {
+      name: 'Andaman and Nicobar',
+      description: 'A tropical paradise with pristine beaches, crystal-clear waters, and rich marine life in the Bay of Bengal.'
     }
   };
-
+  
   const data = destinationData[slug] || { name: 'India', description: 'Incredible India experience awaits you.' };
-
+  
   return {
     id: Math.random(), // Temporary ID for placeholder
     name: data.name,
@@ -424,31 +395,31 @@ const createPlaceholderDestination = (slug: string): Destination => {
   };
 };
 
-// Enhanced fallback images with better quality Unsplash URLs
+// Enhanced fallback images - updated with Supabase Andaman image
 const getFallbackImage = (slug: string): string => {
   const imageMap: { [key: string]: string } = {
     'rishikesh-india': 'https://tfhkqqdlphfizikoxcqo.supabase.co/storage/v1/object/public/getaway-vibe/package-images/packages/rishikesh/Rishikesh.jpg',
     'goa-india': 'https://tfhkqqdlphfizikoxcqo.supabase.co/storage/v1/object/public/getaway-vibe/package-images/packages/goa/gallery/goa-gallery-170h-1754217246917.jpg',
     'ladakh-india': 'https://tfhkqqdlphfizikoxcqo.supabase.co/storage/v1/object/public/getaway-vibe/package-images/packages/ladakh/gallery/ladakh-gallery-6ifr-1754217297438.jpg',
-    'himachal-pradesh-india': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop&auto=format&q=80'
+    'andaman-nicobar-india': 'https://tfhkqqdlphfizikoxcqo.supabase.co/storage/v1/object/public/getaway-vibe/package-images/packages/andaman-nicobar/gallery/andaman-nicobar-gallery-ypx6-1754503268011.jpg'
   };
   
   return imageMap[slug] || 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=800&h=600&fit=crop&auto=format&q=80';
 };
 
-// Europe-style gradient overlays (adapted for Indian colors)
+// Enhanced gradient overlays - updated for Andaman
 const getIndianGradientOverlay = (index: number): string => {
   const gradients = [
     'bg-gradient-to-br from-orange-600/20 via-transparent to-yellow-600/20',   // Rishikesh - sunrise colors
     'bg-gradient-to-br from-blue-600/20 via-transparent to-cyan-600/20',      // Goa - ocean colors  
     'bg-gradient-to-br from-blue-700/20 via-transparent to-purple-600/20',    // Ladakh - high altitude
-    'bg-gradient-to-br from-green-600/20 via-transparent to-emerald-600/20'   // Himachal - mountain green
+    'bg-gradient-to-br from-cyan-600/20 via-transparent to-blue-600/20'       // Andaman - tropical waters
   ];
   return gradients[index % gradients.length];
 };
 
 const getSeasonColor = (index: number): string => {
-  const colors = ['bg-orange-500', 'bg-blue-500', 'bg-purple-500', 'bg-green-500'];
+  const colors = ['bg-orange-500', 'bg-blue-500', 'bg-purple-500', 'bg-cyan-500']; // Updated last color for Andaman
   return colors[index % colors.length];
 };
 
@@ -457,7 +428,7 @@ const getIndianButtonColor = (index: number): string => {
     'bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-700 hover:to-yellow-700',
     'bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700',
     'bg-gradient-to-r from-blue-700 to-purple-700 hover:from-blue-800 hover:to-purple-800',
-    'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700'
+    'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700' // Updated for Andaman
   ];
   return colors[index % colors.length];
 };
@@ -467,7 +438,7 @@ const getIndianFeatureColor = (index: number): string => {
     'bg-orange-100 text-orange-700',
     'bg-blue-100 text-blue-700',
     'bg-purple-100 text-purple-700',
-    'bg-green-100 text-green-700'
+    'bg-cyan-100 text-cyan-700' // Updated for Andaman
   ];
   return colors[index % colors.length];
 };
@@ -477,7 +448,7 @@ const getStateName = (slug: string): string => {
     'rishikesh-india': 'Uttarakhand',
     'goa-india': 'Goa',
     'ladakh-india': 'Ladakh, J&K',
-    'himachal-pradesh-india': 'Himachal Pradesh'
+    'andaman-nicobar-india': 'Andaman & Nicobar' // Updated for Andaman
   };
   return states[slug] || 'India';
 };
@@ -487,7 +458,7 @@ const getIndianPrice = (slug: string): string => {
     'rishikesh-india': '₹15,000',
     'goa-india': '₹25,000',
     'ladakh-india': '₹45,000',
-    'himachal-pradesh-india': '₹35,000'
+    'andaman-nicobar-india': '₹35,000' // Same price as Himachal was
   };
   return prices[slug] || '₹25,000';
 };
@@ -497,7 +468,7 @@ const getIndianFeatures = (slug: string): string[] => {
     'rishikesh-india': ['Yoga & Meditation', 'Adventure Sports'],
     'goa-india': ['Beach Paradise', 'Portuguese Heritage'],
     'ladakh-india': ['High Altitude', 'Buddhist Culture'],
-    'himachal-pradesh-india': ['Hill Stations', 'Snow Mountains']
+    'andaman-nicobar-india': ['Pristine Beaches', 'Marine Life'] // Updated for Andaman
   };
   return features[slug] || ['Cultural Heritage', 'Natural Beauty'];
 };
@@ -507,7 +478,7 @@ const getIndianExperience = (slug: string): string => {
     'rishikesh-india': 'Spiritual Journey',
     'goa-india': 'Beach & Culture',
     'ladakh-india': 'High Altitude Trek',
-    'himachal-pradesh-india': 'Mountain Retreat'
+    'andaman-nicobar-india': 'Island Adventure' // Updated for Andaman
   };
   return experiences[slug] || 'Indian Experience';
 };
@@ -517,7 +488,7 @@ const getIndianExperienceIcon = (slug: string): string => {
     'rishikesh-india': '🧘‍♂️',
     'goa-india': '🏖️',
     'ladakh-india': '🏔️',
-    'himachal-pradesh-india': '⛰️'
+    'andaman-nicobar-india': '🏝️' // Updated for Andaman
   };
   return icons[slug] || '🇮🇳';
 };

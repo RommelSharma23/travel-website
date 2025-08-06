@@ -188,7 +188,7 @@ const ContactModal = ({ isVisible, onClose, prefilledDestination = '' }: Contact
               <h2 className="text-xl font-bold">
                 {prefilledDestination ? `Plan Your ${prefilledDestination} Trip` : 'Plan Your Dream Trip'}
               </h2>
-              <p className="text-sm opacity-90">Get a personalized travel quote in 24 hours</p>
+              
             </div>
           </div>
         </div>
@@ -197,7 +197,7 @@ const ContactModal = ({ isVisible, onClose, prefilledDestination = '' }: Contact
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {submitStatus === 'success' && (
             <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-green-800 font-medium">Thank you! We'll get back to you within 24 hours.</p>
+              <p className="text-green-800 font-medium">Thank you! We'll get back to you soon.</p>
             </div>
           )}
 

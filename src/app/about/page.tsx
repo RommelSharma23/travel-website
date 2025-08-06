@@ -1,5 +1,6 @@
 // src/app/about/page.tsx
 import { Users, Award, Globe, Heart } from 'lucide-react';
+import Image from 'next/image';
 
 export default function AboutPage() {
   const stats = [
@@ -46,10 +47,14 @@ export default function AboutPage() {
               </p>
             </div>
             <div className="relative">
-              <img 
+              <Image 
                 src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&h=400&fit=crop"
-                alt="Beautiful landscape"
+                alt="Beautiful landscape showcasing natural travel destinations"
+                width={600}
+                height={400}
                 className="rounded-lg shadow-xl"
+                priority
+                quality={85}
               />
             </div>
           </div>

@@ -674,22 +674,13 @@ function DestinationsPageContent() {
                     )}
 
                     {/* Meta Info */}
-                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                      <div className="flex items-center gap-4">
-                        {destination.published_at && (
-                          <div className="flex items-center">
-                            <Clock className="w-4 h-4 mr-1" />
-                            Added {new Date(destination.published_at).toLocaleDateString()}
-                          </div>
-                        )}
-                        {destination.package_count && destination.package_count > 0 && (
-                          <div className="flex items-center">
-                            <Users className="w-4 h-4 mr-1" />
-                            {destination.package_count} option{destination.package_count !== 1 ? 's' : ''}
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                  {/* CTA Button */}
+                 {/* Meta Info - Removed "Added" date */}
+<div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+  <div className="flex items-center gap-4">
+   
+  </div>
+</div>
                   </div>
 
                   {/* CTA Button */}
@@ -717,14 +708,14 @@ function DestinationsPageContent() {
         )}
       </section>
 
-      {/* Contact Modal */}
-      {showContactModal && (
-        <ContactModal
-          isOpen={showContactModal}
-          onClose={handleCloseContactModal}
-          source={`Destination Page - ${selectedDestination?.name || 'Unknown'}`}
-        />
-      )}
+     {/* Contact Modal */}
+{showContactModal && (
+  <ContactModal
+    isVisible={showContactModal}  // ✅ CORRECT PROP
+    onClose={handleCloseContactModal}
+    prefilledDestination={selectedDestination?.name || ''}  // ✅ CORRECT PROP
+  />
+)}
 
       <style jsx>{`
         @keyframes fadeInUp {

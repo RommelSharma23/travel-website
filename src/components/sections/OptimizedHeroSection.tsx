@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import Link from 'next/link';
 
 const heroImages = [
   {
@@ -27,7 +28,11 @@ const heroImages = [
   }
 ];
 
-export const OptimizedHeroSection = () => {
+interface OptimizedHeroSectionProps {
+  onOpenContactForm?: () => void;
+}
+
+export const OptimizedHeroSection = ({ onOpenContactForm }: OptimizedHeroSectionProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [imagesLoaded, setImagesLoaded] = useState(false);
 
@@ -73,6 +78,12 @@ export const OptimizedHeroSection = () => {
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % heroImages.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + heroImages.length) % heroImages.length);
+
+  const handleGetQuote = () => {
+    if (onOpenContactForm) {
+      onOpenContactForm();
+    }
+  };
 
   // Show loading skeleton for only 2 seconds max
   if (!imagesLoaded) {
@@ -156,10 +167,19 @@ export const OptimizedHeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <Button className="text-lg px-8 py-4 shadow-xl">
-              Explore Destinations
-            </Button>
-            <Button variant="secondary" className="text-lg px-8 py-4 shadow-xl">
+            {/* Explore Destinations Button - Links to /destinations */}
+            <Link href="/destinations">
+              <Button className="text-lg px-8 py-4 shadow-xl">
+                Explore Destinations
+              </Button>
+            </Link>
+            
+            {/* Get Quote Button - Opens contact form */}
+            <Button 
+              variant="secondary" 
+              className="text-lg px-8 py-4 shadow-xl"
+              onClick={handleGetQuote}
+            >
               Get Quote
             </Button>
           </motion.div>

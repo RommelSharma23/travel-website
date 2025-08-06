@@ -1,7 +1,7 @@
 // src/components/sections/GetawayEurope.tsx
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { supabase } from '@/lib/supabase';
@@ -66,6 +66,29 @@ export const GetawayEurope = ({ onOpenContactForm }: GetawayEuropeProps) => {
   // Europe destinations: Italy, Greece, Switzerland, Spain
   const europeSlugs = ['italy', 'greece', 'switzerland', 'spain'];
 
+  // Pricing map for European destinations
+  const europeanPricing: { [key: string]: number } = {
+    'italy': 115000,      // ₹1.15 Lakh
+    'greece': 70000,      // ₹70,000
+    'switzerland': 150000, // ₹1.50 Lakh  
+    'spain': 115000       // ₹1.15 Lakh
+  };
+
+  // Helper function to get price for a destination
+  const getDestinationPrice = (slug: string): number => {
+    return europeanPricing[slug] || 100000;
+  };
+
+  // Helper function to format price in Indian currency
+  const formatPrice = (price: number): string => {
+    if (price >= 100000) {
+      return `₹${(price / 100000).toFixed(2)}L`.replace('.00', '');
+    } else if (price >= 1000) {
+      return `₹${(price / 1000).toFixed(0)}K`;
+    }
+    return `₹${price.toLocaleString()}`;
+  };
+
   const fetchEuropeDestinations = useCallback(async () => {
     try {
       const { data, error } = await supabase
@@ -93,8 +116,8 @@ export const GetawayEurope = ({ onOpenContactForm }: GetawayEuropeProps) => {
     fetchEuropeDestinations();
   }, [fetchEuropeDestinations]);
 
-  // European themes and colors
-  const europeanThemes = ['Romantic', 'Historic', 'Alpine', 'Cultural'];
+  // European themes and colors - memoized to avoid recreating on every render
+  const europeanThemes = useMemo(() => ['Romantic', 'Historic', 'Alpine', 'Cultural'], []);
 
   return (
     <motion.section 
@@ -178,7 +201,7 @@ export const GetawayEurope = ({ onOpenContactForm }: GetawayEuropeProps) => {
                     </div>
                   </div>
                   
-                  {/* Destination info overlay */}
+                  {/* Destination info overlay with specific pricing */}
                   <div className="absolute bottom-4 left-4 right-4 text-white">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center space-x-1 text-sm opacity-90">
@@ -187,7 +210,9 @@ export const GetawayEurope = ({ onOpenContactForm }: GetawayEuropeProps) => {
                       </div>
                       <div className="text-right">
                         <div className="text-xs opacity-80">From</div>
-                        <div className="font-bold text-lg">₹65,000</div>
+                        <div className="font-bold text-lg">
+                          {formatPrice(getDestinationPrice(destination.slug))}
+                        </div>
                       </div>
                     </div>
                     <h3 className="text-xl font-bold drop-shadow-lg">{destination.name}</h3>
@@ -225,9 +250,6 @@ export const GetawayEurope = ({ onOpenContactForm }: GetawayEuropeProps) => {
                     <span>Get Quote</span>
                   </button>
                 </div>
-
-                {/* European elegance accent */}
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 via-blue-400 to-indigo-400"></div>
               </motion.div>
             ))
           )}
