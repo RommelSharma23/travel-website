@@ -57,6 +57,29 @@ export const FeaturedList = ({ onOpenContactForm }: FeaturedListProps) => {
   // Featured destinations: Vietnam, Bali, Thailand, Dubai (4 cards in a row)
   const featuredSlugs = ['vietnam', 'bali-indonesia', 'thailand', 'dubai-uae'];
 
+  // Pricing map for each destination
+  const destinationPricing: { [key: string]: number } = {
+    'vietnam': 28000,
+    'bali-indonesia': 25000,
+    'thailand': 20000,
+    'dubai-uae': 45000
+  };
+
+  // Helper function to get price for a destination
+  const getDestinationPrice = (slug: string): number => {
+    return destinationPricing[slug] || 25000;
+  };
+
+  // Helper function to format price in Indian currency
+  const formatPrice = (price: number): string => {
+    if (price >= 100000) {
+      return `₹${(price / 100000).toFixed(1)}L`;
+    } else if (price >= 1000) {
+      return `₹${(price / 1000).toFixed(0)}K`;
+    }
+    return `₹${price.toLocaleString()}`;
+  };
+
   // Use useCallback to fix ESLint exhaustive-deps warning
   const fetchFeaturedDestinations = useCallback(async () => {
     try {
@@ -163,12 +186,14 @@ export const FeaturedList = ({ onOpenContactForm }: FeaturedListProps) => {
                     </div>
                   </div>
                   
-                  {/* Destination name overlay */}
+                  {/* Destination name overlay with specific pricing */}
                   <div className="absolute bottom-4 left-4 text-white">
                     <h3 className="text-xl font-bold drop-shadow-lg mb-1">{destination.name}</h3>
                     <div className="flex items-center space-x-1 text-sm opacity-90">
                       <span>Starting from</span>
-                      <span className="font-semibold">₹45,000</span>
+                      <span className="font-semibold text-lg">
+                        {formatPrice(getDestinationPrice(destination.slug))}
+                      </span>
                     </div>
                   </div>
 
