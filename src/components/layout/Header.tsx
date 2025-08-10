@@ -5,8 +5,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
-import { BRAND_ASSETS, COMPANY_INFO, NAVIGATION } from '@/lib/constants';
-import PayNowButton from '@/components/payments/PayNowButton';
+import { BRAND_ASSETS, COMPANY_INFO, NAVIGATION } from '../../lib/constants';
+import PayNowButton from '../payments/PayNowButton';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

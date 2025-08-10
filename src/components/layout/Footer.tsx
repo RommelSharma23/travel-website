@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Phone, Mail, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
-import { BRAND_ASSETS, COMPANY_INFO, NAVIGATION } from '@/lib/constants';
+import { BRAND_ASSETS, COMPANY_INFO, NAVIGATION } from '../../lib/constants';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
