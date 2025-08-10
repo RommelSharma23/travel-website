@@ -14,30 +14,6 @@ export const PAYMENT_CONFIG = {
   MAX_AMOUNT: parseInt(process.env.PAYMENT_MAX_AMOUNT!) || 500000,
 };
 
-// Add environment validation
-export const validateEnvironment = () => {
-  if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID) {
-    throw new Error('Razorpay Key ID is not configured');
-  }
-  
-  if (!process.env.RAZORPAY_KEY_SECRET) {
-    throw new Error('Razorpay Key Secret is not configured');
-  }
-  
-  // Ensure we're using live keys in production
-  if (process.env.NODE_ENV === 'production') {
-    if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID.startsWith('rzp_live_')) {
-      console.error('Current Key ID:', process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID);
-      throw new Error('Production environment must use live Razorpay keys');
-    }
-    if (!process.env.RAZORPAY_KEY_SECRET.startsWith('rzp_live_')) {
-      throw new Error('Production environment must use live Razorpay secret');
-    }
-  }
-  
-  console.log(`Payment Config Loaded - Environment: ${process.env.NODE_ENV}, Key Type: ${process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID?.startsWith('rzp_live_') ? 'LIVE' : 'TEST'}`);
-};
-
 // Keep existing validation functions
 export const validateAmount = (amount: number): string | null => {
   if (!amount || amount < PAYMENT_CONFIG.MIN_AMOUNT) {
