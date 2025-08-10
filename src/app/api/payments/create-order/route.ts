@@ -1,13 +1,14 @@
 // app/api/payments/create-order/route.ts
-// Updated to use service role client only (bypasses RLS)
-
 import { NextRequest, NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 import { createClient } from '@supabase/supabase-js';
-import { PAYMENT_CONFIG, validateAmount, validateEmail, validatePhone, validateName } from '@/lib/payment-config';
+import { PAYMENT_CONFIG, validateAmount, validateEmail, validatePhone, validateName, validateEnvironment } from '@/lib/payment-config';
 import type { PayNowFormData } from '@/types/payment';
 
-// Initialize Razorpay instance
+// Validate environment on startup
+validateEnvironment();
+
+// Initialize Razorpay instance with validation
 const razorpay = new Razorpay({
   key_id: PAYMENT_CONFIG.RAZORPAY.KEY_ID,
   key_secret: PAYMENT_CONFIG.RAZORPAY.KEY_SECRET,
@@ -24,6 +25,20 @@ const supabase = createClient(
     }
   }
 );
+
+// Enhanced logging for live environment
+const logPaymentEvent = (level: 'info' | 'warn' | 'error', message: string, data?: any) => {
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    level,
+    message,
+    environment: process.env.NODE_ENV || 'development',
+    isLive: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID?.startsWith('rzp_live_') || false,
+    data
+  };
+  
+  console.log(`[PAYMENT-${level.toUpperCase()}]`, JSON.stringify(logEntry));
+};
 
 // Log payment attempt
 async function logPaymentAttempt(
@@ -49,6 +64,8 @@ async function logPaymentAttempt(
         metadata: {
           destination_id: formData.destinationId,
           payment_type: formData.paymentType,
+          environment: process.env.NODE_ENV,
+          is_live: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID?.startsWith('rzp_live_')
         },
       });
   } catch (error) {
@@ -62,6 +79,11 @@ export async function POST(request: NextRequest) {
   let formData: PayNowFormData | null = null;
 
   try {
+    // Log environment on each request
+    logPaymentEvent('info', 'Payment order creation started', {
+      keyType: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID?.startsWith('rzp_live_') ? 'LIVE' : 'TEST'
+    });
+
     // Extract client information
     ipAddress = request.headers.get('x-forwarded-for') || 
                 request.headers.get('x-real-ip') || 
@@ -76,7 +98,9 @@ export async function POST(request: NextRequest) {
       customerName: formData.customerName,
       destinationId: formData.destinationId,
       amount: formData.amount,
-      paymentType: formData.paymentType
+      paymentType: formData.paymentType,
+      environment: process.env.NODE_ENV,
+      isLive: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID?.startsWith('rzp_live_')
     });
 
     // Validate required fields
@@ -88,7 +112,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate form data
+    // Enhanced validation for live environment
     const nameError = validateName(formData.customerName);
     const emailError = validateEmail(formData.customerEmail);
     const phoneError = validatePhone(formData.customerPhone);
@@ -97,10 +121,26 @@ export async function POST(request: NextRequest) {
     if (nameError || emailError || phoneError || amountError) {
       const errorMessage = [nameError, emailError, phoneError, amountError].filter(Boolean).join(', ');
       await logPaymentAttempt('payment_attempt', ipAddress, userAgent, formData, `Validation failed: ${errorMessage}`);
+      
+      logPaymentEvent('warn', 'Validation failed', { 
+        errors: [nameError, emailError, phoneError, amountError].filter(Boolean),
+        formData: { ...formData, customerPhone: '***masked***' }
+      });
+      
       return NextResponse.json(
         { success: false, error: 'Invalid form data: ' + errorMessage },
         { status: 400 }
       );
+    }
+
+    // Additional live environment checks
+    if (process.env.NODE_ENV === 'production') {
+      // More strict validation for live payments
+      if (formData.amount < 100) {
+        const error = 'Minimum amount for live payments is ₹100';
+        await logPaymentAttempt('payment_attempt', ipAddress, userAgent, formData, error);
+        return NextResponse.json({ success: false, error }, { status: 400 });
+      }
     }
 
     // Check if destination exists
@@ -135,7 +175,8 @@ export async function POST(request: NextRequest) {
     const generateBookingReference = () => {
       const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
       const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-      return `PAY${date}${random}`;
+      const env = process.env.NODE_ENV === 'production' ? 'LIVE' : 'TEST';
+      return `${env}${date}${random}`;
     };
 
     let bookingReference = generateBookingReference();
@@ -155,7 +196,7 @@ export async function POST(request: NextRequest) {
       attempts++;
     }
 
-    // Create Razorpay order
+    // Create Razorpay order with enhanced options
     console.log('Creating Razorpay order...');
     const orderOptions = {
       amount: Math.round(formData.amount * 100), // Convert to paise
@@ -166,11 +207,23 @@ export async function POST(request: NextRequest) {
         customer_email: formData.customerEmail,
         destination: destination.name,
         payment_type: formData.paymentType,
+        environment: process.env.NODE_ENV || 'development',
+        booking_reference: bookingReference,
       },
     };
 
+    logPaymentEvent('info', 'Creating Razorpay order', {
+      amount: orderOptions.amount,
+      receipt: orderOptions.receipt
+    });
+
     const razorpayOrder = await razorpay.orders.create(orderOptions);
     console.log('Razorpay order created:', razorpayOrder.id);
+
+    logPaymentEvent('info', 'Razorpay order created successfully', {
+      order_id: razorpayOrder.id,
+      amount: razorpayOrder.amount
+    });
 
     // Create booking record (using service role - bypasses RLS)
     const bookingData = {
@@ -185,6 +238,7 @@ export async function POST(request: NextRequest) {
       payment_type: formData.paymentType,
       is_quick_payment: true,
       source: 'pay_now_modal',
+      environment: process.env.NODE_ENV || 'development',
       ...(formData.notes && formData.notes.trim() !== '' ? { quick_payment_notes: formData.notes } : {}),
     };
 
@@ -233,10 +287,17 @@ export async function POST(request: NextRequest) {
         customer_phone: formData.customerPhone,
         booking_id: booking.id,
         payment_status: 'created',
+        environment: process.env.NODE_ENV || 'development',
       });
 
     if (paymentError) {
       console.error('Payment record creation error:', paymentError);
+      
+      logPaymentEvent('error', 'Payment record creation failed', {
+        error: paymentError.message,
+        order_id: razorpayOrder.id
+      });
+      
       await logPaymentAttempt('payment_attempt', ipAddress, userAgent, formData, `Failed to create payment record: ${paymentError.message}`, razorpayOrder.id);
       return NextResponse.json(
         { 
@@ -250,6 +311,12 @@ export async function POST(request: NextRequest) {
 
     // Log successful attempt
     await logPaymentAttempt('payment_attempt', ipAddress, userAgent, formData, undefined, razorpayOrder.id);
+
+    logPaymentEvent('info', 'Order creation completed successfully', {
+      razorpay_order_id: razorpayOrder.id,
+      booking_id: booking.id,
+      booking_reference: bookingReference
+    });
 
     console.log('Order creation successful:', {
       razorpay_order_id: razorpayOrder.id,
@@ -269,6 +336,11 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Create order error:', error);
     
+    logPaymentEvent('error', 'Order creation failed', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    
     if (formData) {
       await logPaymentAttempt('payment_attempt', ipAddress, userAgent, formData, error instanceof Error ? error.message : 'Unknown error');
     }
@@ -278,4 +350,14 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+export async function GET() {
+  // Add environment info endpoint for debugging
+  return NextResponse.json({
+    message: 'Create order API - use POST method',
+    environment: process.env.NODE_ENV,
+    keyType: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID?.startsWith('rzp_live_') ? 'LIVE' : 'TEST',
+    timestamp: new Date().toISOString()
+  });
 }

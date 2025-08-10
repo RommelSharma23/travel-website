@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CreditCard, AlertCircle } from 'lucide-react';
+import { CreditCard } from 'lucide-react';
 import PaymentModal from './PaymentModal';
 import { usePayNowFeature } from '@/hooks/usePayNowFeature';
 
@@ -22,13 +22,17 @@ export default function PayNowButton({
   onError 
 }: PayNowButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { isEnabled, isLoading, disabledReason } = usePayNowFeature();
+  const { isEnabled, isLoading } = usePayNowFeature();
+
+  // COMPLETELY HIDE the button when disabled
+  if (!isEnabled && !isLoading) {
+    return null; // Button is completely hidden - returns nothing
+  }
 
   const handleSuccess = (bookingId: string, paymentId: string) => {
     setIsModalOpen(false);
     onSuccess?.(bookingId, paymentId);
     
-    // Default success behavior - redirect to success page
     if (!onSuccess) {
       window.location.href = `/payment-success?booking=${bookingId}&payment=${paymentId}`;
     }
@@ -37,19 +41,12 @@ export default function PayNowButton({
   const handleError = (error: string) => {
     onError?.(error);
     
-    // Default error behavior - show alert
     if (!onError) {
       alert(`Payment failed: ${error}`);
     }
   };
 
   const handleClick = () => {
-    if (!isEnabled) {
-      const message = disabledReason || 'Payment feature is temporarily unavailable. Please try again later.';
-      handleError(message);
-      return;
-    }
-    
     setIsModalOpen(true);
   };
 
@@ -66,12 +63,7 @@ export default function PayNowButton({
     secondary: 'bg-white hover:bg-gray-50 text-green-600 border border-green-600',
   };
 
-  // Disabled styles
-  const disabledClasses = !isEnabled 
-    ? 'opacity-50 cursor-not-allowed bg-gray-400 text-gray-200 border-gray-400' 
-    : '';
-
-  // Loading state
+  // Show loading state while checking feature status
   if (isLoading) {
     return (
       <button
@@ -91,43 +83,31 @@ export default function PayNowButton({
     );
   }
 
+  // Only render the button if enabled
   return (
     <>
       <button
         onClick={handleClick}
-        disabled={!isEnabled}
         className={`
           inline-flex items-center justify-center
           font-medium rounded-md transition-colors
           focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
-          disabled:opacity-50 disabled:cursor-not-allowed
           ${sizeClasses[size]}
-          ${disabledClasses || variantClasses[variant]}
+          ${variantClasses[variant]}
           ${className}
         `}
-        title={!isEnabled ? (disabledReason || 'Payment feature is temporarily unavailable') : 'Make a quick payment'}
+        title="Make a quick payment"
       >
-        {!isEnabled ? (
-          <>
-            <AlertCircle className="w-4 h-4 mr-2" />
-            Pay Now (Unavailable)
-          </>
-        ) : (
-          <>
-            <CreditCard className="w-4 h-4 mr-2" />
-            Pay Now
-          </>
-        )}
+        <CreditCard className="w-4 h-4 mr-2" />
+        Pay Now
       </button>
 
-      {isEnabled && (
-        <PaymentModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSuccess={handleSuccess}
-          onError={handleError}
-        />
-      )}
+      <PaymentModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={handleSuccess}
+        onError={handleError}
+      />
     </>
   );
 }
