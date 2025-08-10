@@ -6,9 +6,9 @@ import React, { useState, useEffect, useMemo, useCallback, Suspense } from 'reac
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { supabase } from 'src/lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { Calendar, Clock, User, ArrowRight, Search, Filter, Eye, Tag, BookOpen, TrendingUp } from 'lucide-react';
-import { i } from 'framer-motion/m';
+
 
 interface BlogHeader {
   id: number;
