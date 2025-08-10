@@ -6,11 +6,11 @@ import { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '../../../lib/supabase';
 import { MapPin, Clock, Users, Star, ArrowLeft, Crown, Calendar, DollarSign, Eye, Tag } from 'lucide-react';
 
 // Lazy load components for better performance
-const ContactModal = dynamic(() => import('@/components/ui/ContactModal'), {
+const ContactModal = dynamic(() => import('../../../components/ui/ContactModal'), {
   ssr: false,
   loading: () => null
 });
@@ -735,11 +735,11 @@ function DestinationDetailContent() {
 
       {/* Contact Modal */}
       {showContactModal && (
-        <ContactModal
-          isOpen={showContactModal}
-          onClose={() => handleContactModal(false)}
-          source={`${destination.name} Destination Page`}
-        />
+   <ContactModal
+  isVisible={showContactModal}
+  onClose={() => setShowContactModal(false)}
+  prefilledDestination={destination.name}
+/>
       )}
 
       <style jsx>{`

@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { Mail, Phone, MapPin, Clock, Star, ExternalLink, ThumbsUp } from 'lucide-react';
 
 const GOOGLE_REVIEW_URL = 'https://search.google.com/local/writereview?placeid=ChIJY61e6rrr5o0RIhZeFBx_muY';

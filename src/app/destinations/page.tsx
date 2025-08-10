@@ -6,11 +6,11 @@ import { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { MapPin, Clock, Users, Star, Search, Filter, Grid, List, SlidersHorizontal } from 'lucide-react';
 
 // Lazy load the contact modal for better initial load performance
-const ContactModal = dynamic(() => import('@/components/ui/ContactModal'), {
+const ContactModal = dynamic(() => import('../../components/ui/ContactModal'), {
   ssr: false,
   loading: () => null
 });
