@@ -2,8 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 import { createClient } from '@supabase/supabase-js';
-import { PAYMENT_CONFIG, validateAmount, validateEmail, validatePhone, validateName, validateEnvironment } from '@/lib/payment-config';
-import type { PayNowFormData } from '@/types/payment';
+import { PAYMENT_CONFIG, validateAmount, validateEmail, validatePhone, validateName, validateEnvironment } from '../../../../lib/payment-config';
+import type { PayNowFormData } from '../../../../types/payment';
 
 // Validate environment on startup
 validateEnvironment();

@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, MapPin, Calendar, Users, MessageCircle, Send, Plane } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '../../lib/supabase';
 
 const FirstVisitContactModal = () => {
   const [isVisible, setIsVisible] = useState(false);
