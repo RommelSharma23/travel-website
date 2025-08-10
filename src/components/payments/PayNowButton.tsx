@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { CreditCard } from 'lucide-react';
 import PaymentModal from './PaymentModal';
-import { usePayNowFeature } from '@/hooks/usePayNowFeature';
+import { usePayNowFeature } from '../../hooks/usePayNowFeature';
 
 interface PayNowButtonProps {
   className?: string;

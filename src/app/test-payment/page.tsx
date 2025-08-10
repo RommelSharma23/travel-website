@@ -3,7 +3,7 @@
 
 'use client';
 
-import PayNowButton from '@/components/payments/PayNowButton';
+import PayNowButton from '../../components/payments/PayNowButton';
 
 export default function TestPaymentPage() {
   const handleSuccess = (bookingId: string, paymentId: string) => {

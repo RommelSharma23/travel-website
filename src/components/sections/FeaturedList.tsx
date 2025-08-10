@@ -4,7 +4,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { MapPin, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';

@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/Button';
+import { Button } from '../ui/Button';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';

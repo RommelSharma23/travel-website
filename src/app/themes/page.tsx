@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { MapPin, Clock, Users, Star, Search, ArrowRight, Heart, X } from 'lucide-react';
 
 // Lazy load components for better performance

@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '../../lib/supabase';
 import { Destination } from '@/types';
 import { MapPin, Clock, Users } from 'lucide-react';
 

@@ -3,8 +3,8 @@
 
 import { useState, useEffect } from 'react';
 import { X, CreditCard, Shield, AlertCircle } from 'lucide-react';
-import { PAYMENT_CONFIG, PAYMENT_TYPES, validateAmount, validateEmail, validatePhone, validateName, formatCurrency } from '@/lib/payment-config';
-import type { PayNowFormData, Destination, FormErrors, PaymentType } from '@/types/payment';
+import { PAYMENT_CONFIG, PAYMENT_TYPES, validateAmount, validateEmail, validatePhone, validateName, formatCurrency } from '../../lib/payment-config';
+import type { PayNowFormData, Destination, FormErrors, PaymentType } from '../../types/payment';
 
 interface PaymentModalProps {
   isOpen: boolean;
