@@ -19,10 +19,7 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Add experimental features to ensure path aliases work
-  experimental: {
-    typedRoutes: true,
-  },
+
 }
 
 export default nextConfig
