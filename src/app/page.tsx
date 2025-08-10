@@ -3,15 +3,14 @@
 'use client';
 
 import { useState } from 'react';
-import { OptimizedHeroSection } from '@/components/sections/OptimizedHeroSection';
-import { FeaturedList } from '@/components/sections/FeaturedList';
-import { GetawayEurope } from '@/components/sections/GetawayEurope';
-import { UniqueTravel } from '@/components/sections/UniqueTravel';
-import { MyIndia } from '@/components/sections/MyIndia';
-//import { TravelThemes } from '@/components/sections/TravelThemes';
-import GoogleReviewsSection from '@/components/GoogleReviews/GoogleReviewsSection';
-import ContactModal from '@/components/ui/ContactModal';
-import FirstVisitContactModal from '@/components/ui/FirstVisitContactModal';
+import { OptimizedHeroSection } from '../components/sections/OptimizedHeroSection';
+import { FeaturedList } from '../components/sections/FeaturedList';
+import { GetawayEurope } from '../components/sections/GetawayEurope';
+import { UniqueTravel } from '../components/sections/UniqueTravel';
+import { MyIndia } from '../components/sections/MyIndia';
+import GoogleReviewsSection from '../components/GoogleReviews/GoogleReviewsSection';
+import ContactModal from '../components/ui/ContactModal';
+import FirstVisitContactModal from '../components/ui/FirstVisitContactModal';
 
 export default function HomePage() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);

@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '../../../lib/supabase';
 import { 
   MapPin, Clock, Users, Star, ArrowLeft, Calendar, 
   CheckCircle, XCircle, DollarSign, Phone, Mail,
@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 // Lazy load components for better performance
-const ContactModal = dynamic(() => import('@/components/ui/ContactModal'), {
+const ContactModal = dynamic(() => import('../../../components/ui/ContactModal'), {
   ssr: false,
   loading: () => null
 });
@@ -914,11 +914,11 @@ function PackageDetailContent() {
 
       {/* Contact Modal */}
       {showContactModal && (
-        <ContactModal
-          isOpen={showContactModal}
-          onClose={() => handleContactModal(false)}
-          source={`Package Detail - ${packageData.reference_no}`}
-        />
+       <ContactModal
+  isVisible={showContactModal}
+  onClose={() => handleContactModal(false)}
+  prefilledDestination={destination?.name || packageData.title}
+/>
       )}
 
       <style jsx>{`
